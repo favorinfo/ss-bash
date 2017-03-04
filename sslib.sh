@@ -47,57 +47,59 @@ PORTS_ALREADY_BAN=$TMPDIR/ports_already_ban.tmp
 SS_IN_RULES=ssinput
 SS_OUT_RULES=ssoutput
 
+IPTABLES=iptables
+
 del_ipt_chains () {
-    iptables -F $SS_IN_RULES
-    iptables -F $SS_OUT_RULES
-    iptables -D INPUT -j $SS_IN_RULES
-    iptables -D OUTPUT -j $SS_OUT_RULES
-    iptables -X $SS_IN_RULES
-    iptables -X $SS_OUT_RULES
+    $IPTABLES -F $SS_IN_RULES
+    $IPTABLES -F $SS_OUT_RULES
+    $IPTABLES -D INPUT -j $SS_IN_RULES
+    $IPTABLES -D OUTPUT -j $SS_OUT_RULES
+    $IPTABLES -X $SS_IN_RULES
+    $IPTABLES -X $SS_OUT_RULES
 }
 init_ipt_chains () {
     del_ipt_chains 2> /dev/null
-    iptables -N $SS_IN_RULES
-    iptables -N $SS_OUT_RULES
-    iptables -A INPUT -j $SS_IN_RULES
-    iptables -A OUTPUT -j $SS_OUT_RULES
+    $IPTABLES -N $SS_IN_RULES
+    $IPTABLES -N $SS_OUT_RULES
+    $IPTABLES -I INPUT -j $SS_IN_RULES
+    $IPTABLES -I OUTPUT -j $SS_OUT_RULES
 }
 
 add_rules () {
     PORT=$1;
-    iptables -A $SS_IN_RULES -p tcp --dport $PORT -j ACCEPT
-    iptables -A $SS_OUT_RULES -p tcp --sport $PORT -j ACCEPT
-    iptables -A $SS_IN_RULES -p udp --dport $PORT -j ACCEPT
-    iptables -A $SS_OUT_RULES -p udp --sport $PORT -j ACCEPT
+    $IPTABLES -A $SS_IN_RULES -p tcp --dport $PORT -j ACCEPT
+    $IPTABLES -A $SS_OUT_RULES -p tcp --sport $PORT -j ACCEPT
+    $IPTABLES -A $SS_IN_RULES -p udp --dport $PORT -j ACCEPT
+    $IPTABLES -A $SS_OUT_RULES -p udp --sport $PORT -j ACCEPT
 }
 
 add_reject_rules () {
     PORT=$1;
-    iptables -A $SS_IN_RULES -p tcp --dport $PORT -j REJECT
-    iptables -A $SS_OUT_RULES -p tcp --sport $PORT -j REJECT
-    iptables -A $SS_IN_RULES -p udp --dport $PORT -j REJECT
-    iptables -A $SS_OUT_RULES -p udp --sport $PORT -j REJECT
+    $IPTABLES -A $SS_IN_RULES -p tcp --dport $PORT -j REJECT
+    $IPTABLES -A $SS_OUT_RULES -p tcp --sport $PORT -j REJECT
+    $IPTABLES -A $SS_IN_RULES -p udp --dport $PORT -j REJECT
+    $IPTABLES -A $SS_OUT_RULES -p udp --sport $PORT -j REJECT
 }
 
 del_rules () {
     PORT=$1;
-    iptables -D $SS_IN_RULES -p tcp --dport $PORT -j ACCEPT
-    iptables -D $SS_OUT_RULES -p tcp --sport $PORT -j ACCEPT
-    iptables -D $SS_IN_RULES -p udp --dport $PORT -j ACCEPT
-    iptables -D $SS_OUT_RULES -p udp --sport $PORT -j ACCEPT
+    $IPTABLES -D $SS_IN_RULES -p tcp --dport $PORT -j ACCEPT
+    $IPTABLES -D $SS_OUT_RULES -p tcp --sport $PORT -j ACCEPT
+    $IPTABLES -D $SS_IN_RULES -p udp --dport $PORT -j ACCEPT
+    $IPTABLES -D $SS_OUT_RULES -p udp --sport $PORT -j ACCEPT
 }
 
 del_reject_rules () {
     PORT=$1;
-    iptables -D $SS_IN_RULES -p tcp --dport $PORT -j REJECT
-    iptables -D $SS_OUT_RULES -p tcp --sport $PORT -j REJECT
-    iptables -D $SS_IN_RULES -p udp --dport $PORT -j REJECT
-    iptables -D $SS_OUT_RULES -p udp --sport $PORT -j REJECT
+    $IPTABLES -D $SS_IN_RULES -p tcp --dport $PORT -j REJECT
+    $IPTABLES -D $SS_OUT_RULES -p tcp --sport $PORT -j REJECT
+    $IPTABLES -D $SS_IN_RULES -p udp --dport $PORT -j REJECT
+    $IPTABLES -D $SS_OUT_RULES -p udp --sport $PORT -j REJECT
 }
 
 list_rules () {
-    iptables -vnx -L $SS_IN_RULES
-    iptables -vnx -L $SS_OUT_RULES
+    $IPTABLES -vnx -L $SS_IN_RULES
+    $IPTABLES -vnx -L $SS_OUT_RULES
 }
 
 add_new_rules () {
@@ -280,7 +282,7 @@ check_traffic_against_limits () {
     done
 }
 get_traffic_from_iptables () {
-        echo "$(iptables -nvx -L $SS_IN_RULES)" "$(iptables -nvx -L $SS_OUT_RULES)" |
+        echo "$($IPTABLES -nvx -L $SS_IN_RULES)" "$($IPTABLES -nvx -L $SS_OUT_RULES)" |
         sed -nr '/ [sd]pt:[0-9]{1,5}$/ s/[sd]pt:([0-9]{1,5})/\1/p' |
         awk '
         {
