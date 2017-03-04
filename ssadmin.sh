@@ -622,7 +622,7 @@ case $1 in
         shift
         show_user $1
         ;;
-    showpw )
+    showpw | pw | password | pass)
         shift
         show_passwd $1
         ;;
@@ -638,7 +638,7 @@ case $1 in
         shift
         change_limit $1 $2
         ;;
-    rlim )
+    rlim | clean)
         shift
         if [ $# -eq 0 ]; then
             echo "请指定用户端口号"
@@ -664,7 +664,7 @@ case $1 in
             reset_used $1
         fi
         ;;
-    reset_all_used )
+    reset_all_used | cleanall )
         shift
         reset_used
         ;;
@@ -680,10 +680,10 @@ case $1 in
     status )
         status_ss
         ;;
-    soft_restart )
+    soft_restart | reload )
         soft_restart_ss 
         ;;
-    lrules )
+    lrules | iptables )
         list_rules
         ;;
     * )
